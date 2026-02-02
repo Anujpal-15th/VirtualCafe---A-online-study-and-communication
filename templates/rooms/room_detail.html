@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ room.name }} - Virtual Cafe{% endblock %}
+
+{% block content %}
+<div class="room-container">
+    <!-- Room Header -->
+    <div class="room-header">
+        <div class="room-info">
+            <h1>{{ room.name }}</h1>
+            <p class="room-code-display">Room Code: <strong>{{ room.room_code }}</strong></p>
+            <p class="room-description">{{ room.description }}</p>
+        </div>
+        <div class="members-count">
+            <span id="members-count">{{ members_count }}</span> member(s) online
+        </div>
+    </div>
+
+    <div class="room-content">
+        <!-- Left Column: Video Call + Timer -->
+        <div class="left-column">
+            <!-- Video Call Section -->
+            <div class="video-section">
+                <h2>Video Call (1-to-1)</h2>
+                <div id="video-status" class="video-status">
+                    Ready to connect
+                </div>
+                
+                <div class="video-container">
+                    <video id="local-video" autoplay muted playsinline></video>
+                    <video id="remote-video" autoplay playsinline></video>
+                </div>
+                
+                <div class="video-controls">
+                    <button id="start-call-btn" class="btn btn-success">Start Call</button>
+                    <button id="end-call-btn" class="btn btn-danger" style="display:none;">End Call</button>
+                    <button id="toggle-mic-btn" class="btn btn-secondary" style="display:none;">🎤 Mic</button>
+                    <button id="toggle-camera-btn" class="btn btn-secondary" style="display:none;">📹 Camera</button>
+                </div>
+            </div>
+
+            <!-- Pomodoro Timer Section -->
+            <div class="timer-section">
+                <h2>Pomodoro Timer</h2>
+                <div id="timer-display" class="timer-display">25:00</div>
+                
+                <div class="timer-presets">
+                    <button class="preset-btn" data-minutes="25">25/5</button>
+                    <button class="preset-btn" data-minutes="50">50/10</button>
+                    <input type="number" id="custom-minutes" placeholder="Custom" min="1" max="120">
+                </div>
+                
+                <div class="timer-controls">
+                    <button id="start-timer-btn" class="btn btn-primary">Start</button>
+                    <button id="pause-timer-btn" class="btn btn-warning" style="display:none;">Pause</button>
+                    <button id="reset-timer-btn" class="btn btn-secondary">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Chat + Members -->
+        <div class="right-column">
+            <!-- Members List -->
+            <div class="members-section">
+                <h3>Members Online</h3>
+                <ul id="members-list" class="members-list">
+                    {% for membership in active_members %}
+                    <li>{{ membership.user.username }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="chat-section">
+                <h3>Chat</h3>
+                <div id="chat-messages" class="chat-messages"></div>
+                
+                <form id="chat-form" class="chat-form">
+                    <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pass data to JavaScript -->
+<script>
+    const ROOM_CODE = "{{ room.room_code }}";
+    const USERNAME = "{{ user.username }}";
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/room.js"></script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Progress - Virtual Cafe{% endblock %}
+
+{% block content %}
+<div class="progress-container">
+    <h1>Your Study Progress</h1>
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Today</h3>
+            <p class="stat-value">{{ today_total }}</p>
+            <p class="stat-label">minutes</p>
+        </div>
+        
+        <div class="stat-card">
+            <h3>This Week</h3>
+            <p class="stat-value">{{ week_total }}</p>
+            <p class="stat-label">minutes</p>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Total Sessions</h3>
+            <p class="stat-value">{{ recent_sessions|length }}</p>
+            <p class="stat-label">completed</p>
+        </div>
+    </div>
+
+    <!-- Last 7 Days Chart -->
+    <div class="chart-section">
+        <h2>Last 7 Days</h2>
+        <div class="chart-container">
+            {% for day in last_7_days %}
+            <div class="chart-bar-wrapper">
+                <div class="chart-bar" style="height: {% if day.minutes > 0 %}{{ day.minutes|add:'0'|floatformat:0 }}px{% else %}10px{% endif %};">
+                    <span class="bar-value">{{ day.minutes }}</span>
+                </div>
+                <span class="bar-label">{{ day.date }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Sessions -->
+    <div class="sessions-section">
+        <h2>Recent Sessions</h2>
+        {% if recent_sessions %}
+        <table class="sessions-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Duration</th>
+                    <th>Room</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in recent_sessions %}
+                <tr>
+                    <td>{{ session.created_at|date:"M d, Y H:i" }}</td>
+                    <td>{{ session.minutes }} min</td>
+                    <td>{% if session.room %}{{ session.room.name }}{% else %}-{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-sessions">No study sessions recorded yet. Complete a Pomodoro timer to log your first session!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

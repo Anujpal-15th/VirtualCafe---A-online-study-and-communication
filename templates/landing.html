@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Virtual Cafe - Your Digital Escape</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        .landing-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-center {
+            display: flex;
+            gap: 3rem;
+        }
+        
+        .nav-center a {
+            color: #333;
+            text-decoration: none;
+            font-size: 1.05rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-center a:hover {
+            color: #667eea;
+        }
+        
+        .nav-right {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .icon-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            background: transparent;
+        }
+        
+        .icon-btn.video {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .icon-btn.video:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .icon-btn.profile {
+            color: #667eea;
+        }
+        
+        .icon-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), 
+                        url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1920') center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .hero-clock {
+            font-size: 4rem;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 700px;
+            line-height: 1.8;
+            margin-bottom: 3rem;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        .cta-button {
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 154, 158, 0.4);
+        }
+        
+        /* Cafes Section */
+        .cafes-section {
+            padding: 5rem 3rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .title-underline {
+            width: 80px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 0 auto;
+            border-radius: 2px;
+        }
+        
+        .cafes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .cafe-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .cafe-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .cafe-image {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .cafe-content {
+            padding: 2rem;
+        }
+        
+        .cafe-content h3 {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .cafe-content p {
+            color: rgba(rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 3rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .landing-footer p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem
+            padding: 3rem;
+            text-align: center;
+        }
+        
+        .landing-footer p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        @media (max-width: 768px) {
+            .landing-nav {
+                padding: 1rem 1.5rem;
+            }
+            
+            .nav-center {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-clock {
+                font-size: 2.5rem;
+            }
+            
+            .cafes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="landing-nav">
+        <div class="logo">The Virtual Cafe</div>
+        <div class="nav-center">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#features">Features</a>
+            <a href="{% url 'login' %}" class="icon-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+            </a fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-clock" id="clock">09:49 PM</div>
+        <h1>Your Digital Escape</h1>
+        <p>Sip, socialize, and play in a virtual space designed just for you. Boot up.<br>Brew's ready.</p>
+        <a href="{% url 'login' %}" class="cta-button">Explore Cafes</a>
+    </section>
+
+    <!-- Cafes Section -->
+    <section class="cafes-section" id="features">
+        <div class="section-title">
+            <h2>Explore Our Cafe Worlds</h2>
+            <div class="title-underline"></div>
+        </div>
+        <div class="cafes-grid">
+            <div class="cafe-card">
+                <div class="cafe-image" style="background-image: url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600');"></div>
+                <div class="cafe-content">
+                    <h3>Cozy Corner Cafe</h3>
+                    <p>A warm, inviting space with soft lighting and comfortable seating. Perfect for focused study sessions.</p>
+                </div>
+            </div>
+            <div class="cafe-card">
+                <div class="cafe-image" style="background-image: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600');"></div>
+                <div class="cafe-content">
+                    <h3>Modern Study Hub</h3>
+                    <p>Sleek, minimalist design with high-speed vibes. Ideal for productivity and collaboration.</p>
+                </div>
+            </div>
+            <div class="cafe-card">
+                <div class="cafe-image" style="background-image: url('https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600');"></div>
+                <div class="cafe-content">
+                    <h3>Garden Terrace</h3>
+                    <p>Nature-inspired atmosphere with greenery and natural light. Study surrounded by tranquility.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <p>&copy; 2026 The Virtual Cafe - Your Digital Study Space</p>
+    </footer>
+
+    <script>
+        // Update clock every second
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            const displayMinutes = minutes.toString().padStart(2, '0');
+            
+            document.getElementById('clock').textContent = 
+                `${displayHours.toString().padStart(2, '0')}:${displayMinutes} ${ampm}`;
+        }
+        
+        updateClock();
+        setInterval(updateClock, 1000);
+        
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        
+        // Theme toggle (placeholder)
+        function toggleTheme() {
+            alert('Dark mode coming soon!');
+        }
+    </script>
+</body>
+</html>

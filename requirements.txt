@@ -1,0 +1,25 @@
+# Virtual Cafe - Requirements
+# Core Django
+Django==4.2.7
+
+# Image handling for user avatars
+Pillow==10.2.0
+
+# Django Channels for WebSocket support
+channels==4.0.0
+channels-redis==4.1.0
+
+# ASGI server
+daphne==4.0.0
+
+# Redis client for channel layer
+redis==5.0.1
+
+# PostgreSQL support (optional for production)
+psycopg[binary]==3.1.18
+
+# Environment variables management
+python-dotenv==1.0.0
+
+# Django utilities
+Pillow==10.2.0

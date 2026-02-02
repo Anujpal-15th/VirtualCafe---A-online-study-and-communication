@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Virtual Cafe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .home-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .home-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        background: white;
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    .home-header h1 {
+        color: #333;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    .home-header p {
+        color: #666;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+    .btn-large {
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        display: inline-block;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .btn-large:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    .rooms-section {
+        margin-bottom: 3rem;
+    }
+    .rooms-section h2 {
+        color: #333;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    .rooms-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    .room-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .room-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    .room-card-header h3 {
+        color: #333;
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+    }
+    .room-code {
+        background: #f0f0f0;
+        color: #667eea;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        display: inline-block;
+        font-weight: 600;
+    }
+    .room-description {
+        color: #666;
+        margin: 1rem 0;
+    }
+    .room-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+    .room-creator {
+        color: #999;
+        font-size: 0.9rem;
+    }
+    .btn-secondary {
+        padding: 0.5rem 1.2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: transform 0.3s;
+    }
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+    }
+    .no-rooms {
+        color: #666;
+        text-align: center;
+        padding: 2rem;
+        font-size: 1.1rem;
+    }
+
+    /* Dark Theme */
+    body.dark-theme .home-header {
+        background: #2d2d2d;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    body.dark-theme .home-header h1 {
+        color: #e0e0e0;
+    }
+    body.dark-theme .home-header p {
+        color: #b0b0b0;
+    }
+    body.dark-theme .rooms-section h2 {
+        color: #e0e0e0;
+    }
+    body.dark-theme .room-card {
+        background: #2d2d2d;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+    body.dark-theme .room-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    }
+    body.dark-theme .room-card-header h3 {
+        color: #e0e0e0;
+    }
+    body.dark-theme .room-code {
+        background: #3d3d3d;
+        color: #8ba3f0;
+    }
+    body.dark-theme .room-description {
+        color: #b0b0b0;
+    }
+    body.dark-theme .room-creator {
+        color: #777;
+    }
+    body.dark-theme .no-rooms {
+        color: #b0b0b0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="home-header">
+        <h1>Welcome to Virtual Cafe ☕</h1>
+        <p>Join study rooms, connect with others, and track your progress!</p>
+        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap;">
+            <a href="{% url 'solo:study_room' %}" class="btn btn-primary btn-large" style="min-width: 200px;">
+                🎯 Solo Study Room
+            </a>
+            <a href="{% url 'create_room' %}" class="btn btn-primary btn-large" style="min-width: 200px;">
+                ➕ Create New Room
+            </a>
+        </div>
+    </div>
+
+    <!-- Your Rooms Section -->
+    {% if user_rooms %}
+    <section class="rooms-section">
+        <h2>Your Rooms</h2>
+        <div class="rooms-grid">
+            {% for room in user_rooms %}
+            <div class="room-card">
+                <div class="room-card-header">
+                    <h3>{{ room.name }}</h3>
+                    <span class="room-code">Code: {{ room.room_code }}</span>
+                </div>
+                <p class="room-description">{{ room.description|truncatewords:20 }}</p>
+                <div class="room-card-footer">
+                    <span class="room-creator">By {{ room.created_by.username }}</span>
+                    <a href="{% url 'room_detail' room.room_code %}" class="btn btn-secondary">Join Room</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- All Available Rooms -->
+    <section class="rooms-section">
+        <h2>All Study Rooms</h2>
+        
+        {% if rooms %}
+        <div class="rooms-grid">
+            {% for room in rooms %}
+            <div class="room-card">
+                <div class="room-card-header">
+                    <h3>{{ room.name }}</h3>
+                    <span class="room-code">Code: {{ room.room_code }}</span>
+                </div>
+                <p class="room-description">{{ room.description|truncatewords:20 }}</p>
+                <div class="room-card-footer">
+                    <span class="room-creator">By {{ room.created_by.username }}</span>
+                    <a href="{% url 'room_detail' room.room_code %}" class="btn btn-secondary">Join Room</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="no-rooms">No rooms available yet. Be the first to create one!</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

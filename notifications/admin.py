@@ -1,0 +1,50 @@
+from django.contrib import admin
+from .models import Notification
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    """
+    Admin interface for managing notifications
+    """
+    list_display = ('title', 'recipient', 'sender', 'notification_type', 'is_read', 'created_at')
+    list_filter = ('notification_type', 'is_read', 'created_at')
+    search_fields = ('title', 'message', 'recipient__username', 'sender__username')
+    date_hierarchy = 'created_at'
+    readonly_fields = ('created_at', 'read_at')
+    
+    fieldsets = (
+        ('Notification Details', {
+            'fields': ('notification_type', 'title', 'message', 'link')
+        }),
+        ('Users', {
+            'fields': ('recipient', 'sender')
+        }),
+        ('Status', {
+            'fields': ('is_read', 'read_at', 'created_at')
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        # Notifications should be created programmatically, not manually
+        return True
+    
+    actions = ['mark_as_read', 'mark_as_unread']
+    
+    def mark_as_read(self, request, queryset):
+        """
+        Bulk action to mark notifications as read
+        """
+        from django.utils import timezone
+        count = queryset.update(is_read=True, read_at=timezone.now())
+        self.message_user(request, f"{count} notification(s) marked as read.")
+    mark_as_read.short_description = "Mark selected notifications as read"
+    
+    def mark_as_unread(self, request, queryset):
+        """
+        Bulk action to mark notifications as unread
+        """
+        count = queryset.update(is_read=False, read_at=None)
+        self.message_user(request, f"{count} notification(s) marked as unread.")
+    mark_as_unread.short_description = "Mark selected notifications as unread"
+

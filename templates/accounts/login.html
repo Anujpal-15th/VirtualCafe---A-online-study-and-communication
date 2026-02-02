@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Virtual Cafe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+    }
+    .auth-box {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem;
+        max-width: 450px;
+        width: 100%;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    .auth-box h1 {
+        color: #333;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    .subtitle {
+        color: #666;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .form-errors {
+        background: #ffebee;
+        color: #c62828;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border-left: 4px solid #f44336;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        background: #f9f9f9;
+        color: #333;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    .form-group input::placeholder {
+        color: #999;
+    }
+    .form-extras {
+        text-align: right;
+        margin-bottom: 1.5rem;
+    }
+    .forgot-password {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .forgot-password:hover {
+        text-decoration: underline;
+    }
+    .btn-primary {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #666;
+    }
+    .auth-footer a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* Dark Theme */
+    body.dark-theme .auth-box {
+        background: #2d2d2d;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+    body.dark-theme .auth-box h1 {
+        color: #e0e0e0;
+    }
+    body.dark-theme .subtitle {
+        color: #b0b0b0;
+    }
+    body.dark-theme .form-errors {
+        background: #b71c1c;
+        color: #ef9a9a;
+    }
+    body.dark-theme .form-group label {
+        color: #e0e0e0;
+    }
+    body.dark-theme .form-group input {
+        background: #3d3d3d;
+        border-color: #4d4d4d;
+        color: #e0e0e0;
+    }
+    body.dark-theme .form-group input:focus {
+        border-color: #667eea;
+    }
+    body.dark-theme .form-group input::placeholder {
+        color: #777;
+    }
+    body.dark-theme .forgot-password {
+        color: #8ba3f0;
+    }
+    body.dark-theme .auth-footer {
+        color: #b0b0b0;
+    }
+    body.dark-theme .auth-footer a {
+        color: #8ba3f0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h1>Welcome Back!</h1>
+        <p class="subtitle">Login to continue your study journey</p>
+        
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            <!-- Display form errors -->
+            {% if form.errors %}
+            <div class="form-errors">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if form.non_field_errors %}
+            <div class="form-errors">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Username field -->
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Username</label>
+                {{ form.username }}
+            </div>
+            
+            <!-- Password field -->
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}">Password</label>
+                {{ form.password }}
+            </div>
+            
+            <div class="form-extras">
+                <a href="{% url 'password_reset' %}" class="forgot-password">Forgot password?</a>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        
+        <p class="auth-link">
+            Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
