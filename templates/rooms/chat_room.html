@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+
+{% block title %}Global Chat - Virtual Cafe{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Discord-style chat layout */
+    .chat-container {
+        display: flex;
+        height: calc(100vh - 140px);
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    /* Members sidebar */
+    .members-sidebar {
+        width: 240px;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .members-header {
+        padding: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .members-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px;
+    }
+    
+    .members-list::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .members-list::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .members-list::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+    }
+    
+    .member-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        border-radius: 6px;
+        margin-bottom: 2px;
+        transition: background 0.15s;
+        cursor: pointer;
+    }
+    
+    .member-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .member-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #667eea;
+    }
+    
+    .member-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .member-status {
+        width: 10px;
+        height: 10px;
+        background: #43b581;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 0, 0, 0.4);
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+    
+    /* Chat area */
+    .chat-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .chat-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .chat-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #fff;
+    }
+    
+    .chat-description {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-left: auto;
+    }
+    
+    /* Messages */
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+    }
+    
+    .message {
+        display: flex;
+        gap: 12px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background 0.1s;
+    }
+    
+    .message:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+    
+    .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    
+    .message-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .message-header {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 2px;
+    }
+    
+    .message-username {
+        font-weight: 600;
+        font-size: 15px;
+        color: #fff;
+    }
+    
+    .message-timestamp {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .message-text {
+        font-size: 15px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.85);
+        word-wrap: break-word;
+    }
+    
+    /* Chat input */
+    .chat-input-container {
+        padding: 16px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .chat-form {
+        display: flex;
+        gap: 12px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 4px;
+    }
+    
+    .chat-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 12px 16px;
+        color: #fff;
+        font-size: 15px;
+        outline: none;
+    }
+    
+    .chat-input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .chat-send-btn {
+        background: #667eea;
+        color: #fff;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .chat-send-btn:hover {
+        background: #5568d3;
+        transform: translateY(-1px);
+    }
+    
+    .chat-send-btn:active {
+        transform: translateY(0);
+    }
+    
+    /* Empty state */
+    .empty-chat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: rgba(255, 255, 255, 0.4);
+        gap: 12px;
+    }
+    
+    .empty-chat svg {
+        width: 64px;
+        height: 64px;
+        opacity: 0.3;
+    }
+    
+    .empty-chat-text {
+        font-size: 16px;
+        font-weight: 500;
+    }
+    
+    .empty-chat-subtext {
+        font-size: 13px;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .members-sidebar {
+            position: fixed;
+            left: -240px;
+            top: 0;
+            bottom: 0;
+            z-index: 1000;
+            transition: left 0.3s;
+        }
+        
+        .members-sidebar.show {
+            left: 90px;
+        }
+        
+        .chat-container {
+            height: calc(100vh - 120px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Members Sidebar -->
+    <div class="members-sidebar">
+        <div class="members-header">
+            Members — <span id="members-count">{{ members_count }}</span>
+        </div>
+        <div class="members-list" id="members-list">
+            {% for membership in active_members %}
+            <div class="member-item">
+                <div style="position: relative;">
+                    <img src="{{ membership.user.profile.get_avatar_url }}" 
+                         alt="{{ membership.user.username }}" 
+                         class="member-avatar">
+                    <div class="member-status"></div>
+                </div>
+                <span class="member-name">{{ membership.user.username }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Chat Area -->
+    <div class="chat-area">
+        <div class="chat-header">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px; color: #667eea;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
+            </svg>
+            <span class="chat-title">{{ room.name }}</span>
+            <span class="chat-description">{{ room.description }}</span>
+        </div>
+        
+        <div id="chat-messages" class="chat-messages">
+            <div class="empty-chat">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+                <div class="empty-chat-text">Welcome to Global Chat!</div>
+                <div class="empty-chat-subtext">Start the conversation...</div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <form id="chat-form" class="chat-form">
+                <input type="text" 
+                       id="chat-input" 
+                       class="chat-input"
+                       placeholder="Message #global-chat" 
+                       autocomplete="off"
+                       maxlength="2000">
+                <button type="submit" class="chat-send-btn">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Pass data to JavaScript -->
+<script>
+    const ROOM_CODE = "{{ room.room_code }}";
+    const USERNAME = "{{ user.username }}";
+    const USER_AVATAR = "{{ user.profile.get_avatar_url }}";
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/chat.js"></script>
+{% endblock %}

@@ -29,10 +29,10 @@ def home_view(request):
     Home dashboard showing all available rooms.
     Users must be logged in to see this page.
     """
-    # Clean up expired rooms
+    # Clean up expired rooms (excluding the global room)
     expired_rooms = Room.objects.filter(
         expires_at__lte=timezone.now()
-    )
+    ).exclude(room_code='GLOBAL')
     expired_count = expired_rooms.count()
     if expired_count > 0:
         expired_rooms.delete()
@@ -105,6 +105,65 @@ def create_room_view(request):
     
     # GET request - show form
     return render(request, 'rooms/create_room.html')
+
+
+@login_required
+def global_chat_view(request):
+    """
+    Global chat room where anyone can join and chat with everyone.
+    Creates the global room if it doesn't exist.
+    """
+    # Get or create the global chat room
+    global_room, created = Room.objects.get_or_create(
+        room_code='GLOBAL',
+        defaults={
+            'name': 'Global Chat Room',
+            'description': 'A public space where everyone can chat and study together!',
+            'created_by': request.user
+        }
+    )
+    
+    # If room was just created, set it as not expiring
+    if created:
+        global_room.expires_at = None
+        global_room.save()
+    
+    # Check if user is already a member
+    existing_membership = RoomMembership.objects.filter(
+        user=request.user,
+        room=global_room
+    ).first()
+    
+    # If already a member, reactivate if needed
+    if existing_membership:
+        if not existing_membership.is_active:
+            existing_membership.is_active = True
+            existing_membership.save()
+    else:
+        # Create new membership
+        RoomMembership.objects.create(
+            user=request.user,
+            room=global_room,
+            is_active=True
+        )
+    
+    # Update room activity
+    global_room.update_activity()
+    
+    # Get all active members in the room
+    active_members = RoomMembership.objects.filter(
+        room=global_room,
+        is_active=True
+    ).select_related('user')
+    
+    context = {
+        'room': global_room,
+        'active_members': active_members,
+        'members_count': active_members.count(),
+        'is_owner': global_room.created_by == request.user,
+        'is_global': True,  # Flag to indicate this is the global room
+    }
+    return render(request, 'rooms/chat_room.html', context)
 
 
 @login_required

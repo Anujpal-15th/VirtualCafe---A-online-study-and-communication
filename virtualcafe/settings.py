@@ -9,11 +9,15 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file
+import logging
+
+logger = logging.getLogger(__name__)
+
 try:
     from dotenv import load_dotenv
     load_dotenv(os.path.join(BASE_DIR, '.env'))
 except Exception as e:
-    print(f"Warning: Could not load .env file: {e}")
+    logger.warning(f"Could not load .env file: {e}")
     # Fallback: load from system environment
     pass
 
@@ -146,7 +150,7 @@ if USE_POSTGRES:
             'PORT': os.getenv('DB_PORT', '5432'),                    # Database port
         }
     }
-    print(" Using PostgreSQL database")
+    logger.info("Using PostgreSQL database")
 else:
     # SQLite Configuration (Development/Default)
     # SQLite is a file-based database, perfect for development
@@ -157,7 +161,7 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    print(" Using SQLite database")
+    logger.info("Using SQLite database")
 
 
 # Password validation

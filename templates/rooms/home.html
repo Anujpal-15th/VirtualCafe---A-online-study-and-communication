@@ -242,58 +242,5 @@
             </a>
         </div>
     </div>
-
-    <!-- Your Rooms Section -->
-    {% if user_rooms %}
-    <section class="rooms-section">
-        <h2>🏠 Your Rooms</h2>
-        <div class="rooms-grid">
-            {% for room in user_rooms %}
-            <div class="room-card">
-                <div class="room-card-header">
-                    <h3>{{ room.name }}</h3>
-                    <span class="room-code">Code: {{ room.room_code }}</span>
-                </div>
-                <p class="room-description">{{ room.description|truncatewords:20 }}</p>
-                <div class="room-card-footer">
-                    <span class="room-creator">
-                        <img src="{{ room.created_by.profile.get_avatar_url }}" alt="{{ room.created_by.username }}" class="creator-avatar">
-                        {{ room.created_by.username }}
-                    </span>
-                    <a href="{% url 'room_detail' room.room_code %}" class="btn-join">Join Room</a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
-
-    <!-- All Available Rooms -->
-    <section class="rooms-section">
-        <h2>🌍 All Study Rooms</h2>
-        
-        {% if rooms %}
-        <div class="rooms-grid">
-            {% for room in rooms %}
-            <div class="room-card">
-                <div class="room-card-header">
-                    <h3>{{ room.name }}</h3>
-                    <span class="room-code">Code: {{ room.room_code }}</span>
-                </div>
-                <p class="room-description">{{ room.description|truncatewords:20 }}</p>
-                <div class="room-card-footer">
-                    <span class="room-creator">
-                        <img src="{{ room.created_by.profile.get_avatar_url }}" alt="{{ room.created_by.username }}" class="creator-avatar">
-                        {{ room.created_by.username }}
-                    </span>
-                    <a href="{% url 'room_detail' room.room_code %}" class="btn-join">Join Room</a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p class="no-rooms">No rooms available yet. Be the first to create one!</p>
-        {% endif %}
-    </section>
 </div>
 {% endblock %}
