@@ -146,6 +146,48 @@
     body.dark-theme .btn-secondary:hover {
         background: #4d4d4d;
     }
+    
+    /* Checkbox styles */
+    .checkbox-group {
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 1rem;
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 10px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+    
+    .checkbox-group label {
+        margin: 0 !important;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    
+    .checkbox-label-main {
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.95);
+    }
+    
+    .checkbox-label-desc {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 400;
+    }
+    
+    body.dark-theme .checkbox-group {
+        background: rgba(102, 126, 234, 0.15);
+    }
 </style>
 {% endblock %}
 
@@ -168,6 +210,14 @@
                 <label for="description">Description</label>
                 <textarea id="description" name="description" rows="4" 
                           placeholder="What will you study in this room?"></textarea>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="is_public" name="is_public" checked>
+                <label for="is_public">
+                    <span class="checkbox-label-main">🌐 Make this room public</span>
+                    <span class="checkbox-label-desc">Public rooms are visible to all users and anyone can join. Uncheck to make it private (only accessible via room code).</span>
+                </label>
             </div>
             
             <div class="form-actions">

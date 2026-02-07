@@ -82,6 +82,143 @@
         transform: translateY(-2px);
     }
     
+    /* Join by Code Modal Styles */
+    .modal-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modal-backdrop.active {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: rgba(26, 26, 46, 0.95);
+        border: 1px solid rgba(102, 126, 234, 0.4);
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 450px;
+        width: 90%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            transform: translateY(-30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .modal-header h3 {
+        color: #fff;
+        font-size: 1.5rem;
+        margin: 0;
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+    .modal-close:hover {
+        color: #fff;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .form-group input {
+        width: 100%;
+        padding: 0.8rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+    
+    .form-group input::placeholder {
+        text-transform: none;
+        letter-spacing: normal;
+        color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: 0.8rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .modal-info {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .modal-info p {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+    
     .rooms-section {
         margin-bottom: 3rem;
     }
@@ -111,10 +248,16 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
     
-    .room-card:hover {
+    .room-card-link {
+        display: block;
+        text-decoration: none !important;
+    }
+    
+    .room-card-link:hover .room-card {
         transform: translateY(-5px);
         box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
         border-color: rgba(102, 126, 234, 0.6);
+        cursor: pointer;
     }
     
     .room-card-header h3 {
@@ -145,6 +288,16 @@
         align-items: center;
         margin-top: 1rem;
     }
+    
+    .member-count {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        font-weight: 500;
+        background: rgba(102, 126, 234, 0.2);
+        padding: 0.3rem 0.8rem;
+        border-radius: 12px;
+    }
+    
     .room-creator {
         color: rgba(255, 255, 255, 0.6);
         font-size: 0.9rem;
@@ -240,7 +393,115 @@
             <a href="{% url 'create_room' %}" class="btn-large btn-secondary">
                 ➕ Create New Room
             </a>
+            <button onclick="openJoinModal()" class="btn-large btn-secondary">
+                🔑 Join by Code
+            </button>
         </div>
     </div>
+    
+    <!-- Join Room by Code Modal -->
+    <div id="joinModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔑 Join Room by Code</h3>
+                <button class="modal-close" onclick="closeJoinModal()">&times;</button>
+            </div>
+            <form method="POST" action="{% url 'join_room_by_code' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="room_code">Enter Room Code:</label>
+                    <input 
+                        type="text" 
+                        id="room_code" 
+                        name="room_code" 
+                        placeholder="e.g., ABC123"
+                        maxlength="10"
+                        required
+                        autofocus
+                    >
+                </div>
+                <button type="submit" class="btn-submit">Join Room</button>
+                <div class="modal-info">
+                    <p>💡 <strong>Tip:</strong> Get the room code from the room creator to join their study session!</p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Available Public Rooms Section -->
+    <div class="rooms-section">
+        <h2>📚 My Rooms</h2>
+        
+        {% if rooms %}
+        <div class="rooms-grid">
+            {% for room in rooms %}
+            <a href="{% url 'room_detail' room_code=room.room_code %}" class="room-card-link" style="text-decoration: none; color: inherit;">
+                <div class="room-card">
+                    <div class="room-card-header">
+                        <h3>{{ room.name }}</h3>
+                        <span class="room-code">{{ room.room_code }}</span>
+                    </div>
+                    <p class="room-description">
+                        {% if room.description %}
+                            {{ room.description|truncatewords:20 }}
+                        {% else %}
+                            No description provided
+                        {% endif %}
+                    </p>
+                    <div class="room-card-footer">
+                        <div class="room-creator">
+                            <img src="{{ room.created_by.profile.get_avatar_url }}" alt="{{ room.created_by.username }}" class="creator-avatar">
+                            <span>{{ room.created_by.username }}</span>
+                        </div>
+                        <span class="member-count">👥 {{ room.member_count }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-rooms">
+            {% if search_query %}
+                <p>No rooms found matching "{{ search_query }}"</p>
+            {% else %}
+                <p>You haven't created any public rooms yet. Create your first room to get started!</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Modal functions
+    function openJoinModal() {
+        document.getElementById('joinModal').classList.add('active');
+        document.getElementById('room_code').focus();
+    }
+    
+    function closeJoinModal() {
+        document.getElementById('joinModal').classList.remove('active');
+        document.getElementById('room_code').value = '';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('joinModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeJoinModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeJoinModal();
+        }
+    });
+    
+    // Auto-uppercase room code input
+    document.getElementById('room_code').addEventListener('input', function(e) {
+        this.value = this.value.toUpperCase();
+    });
+</script>
 {% endblock %}

@@ -20,6 +20,7 @@ class Room(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     last_activity = models.DateTimeField(default=timezone.now)  # Track last activity in room
     expires_at = models.DateTimeField(null=True, blank=True)  # When room will expire if empty
+    is_public = models.BooleanField(default=True)  # Whether room is visible in public listing
     
     def save(self, *args, **kwargs):
         """
