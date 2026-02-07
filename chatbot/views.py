@@ -3,14 +3,14 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
 import os
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 # API key directly
 GEMINI_API_KEY = 'AIzaSyAQSDQbkczqyxypaD6uB5x7qicQ7RqCQOI'
 
 # Initialize Gemini client
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-pro')
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 @csrf_exempt
@@ -29,14 +29,17 @@ def chatbot_api(request):
                 'reply': 'Please provide a message.'
             }, status=400)
 
-        if not model or not GEMINI_API_KEY:
+        if not client or not GEMINI_API_KEY:
             return JsonResponse({
                 'reply': 'Chatbot service is not configured. Please contact support.'
             }, status=500)
         
         # Get response from Gemini
         try:
-            response = model.generate_content(user_message)
+            response = client.models.generate_content(
+                model='gemini-2.0-flash-exp',
+                contents=user_message
+            )
             bot_reply = response.text if response.text else 'I could not generate a response. Please try again.'
 
         except Exception as e:

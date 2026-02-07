@@ -30,6 +30,53 @@
     body.dark-theme .member-name {
         color: #e0e0e0;
     }
+    
+    /* Room Code Display Styles */
+    .room-code-display {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(102, 126, 234, 0.15);
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(102, 126, 234, 0.4);
+        margin: 8px 0;
+    }
+    
+    .room-code-display strong {
+        font-size: 1.1rem;
+        color: #667eea;
+        letter-spacing: 2px;
+        font-weight: 700;
+    }
+    
+    .copy-code-btn {
+        background: rgba(102, 126, 234, 0.2);
+        border: 1px solid rgba(102, 126, 234, 0.4);
+        color: #667eea;
+        padding: 4px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+    
+    .copy-code-btn:hover {
+        background: rgba(102, 126, 234, 0.3);
+        border-color: #667eea;
+        transform: scale(1.05);
+    }
+    
+    .copy-code-btn.copied {
+        background: rgba(46, 213, 115, 0.2);
+        border-color: #2ed573;
+        color: #2ed573;
+    }
+    
+    body.dark-theme .room-code-display strong {
+        color: #a8b7ff;
+    }
 </style>
 {% endblock %}
 
@@ -39,7 +86,10 @@
     <div class="room-header">
         <div class="room-info">
             <h1>{{ room.name }}</h1>
-            <p class="room-code-display">Room Code: <strong>{{ room.room_code }}</strong></p>
+            <div class="room-code-display">
+                📋 Room Code: <strong id="room-code-text">{{ room.room_code }}</strong>
+                <button onclick="copyRoomCode()" class="copy-code-btn" id="copy-btn">Copy</button>
+            </div>
             <p class="room-description">{{ room.description }}</p>
         </div>
         <div class="members-count">
@@ -122,6 +172,27 @@
 <script>
     const ROOM_CODE = "{{ room.room_code }}";
     const USERNAME = "{{ user.username }}";
+    
+    // Copy room code to clipboard
+    function copyRoomCode() {
+        const roomCode = document.getElementById('room-code-text').textContent;
+        const copyBtn = document.getElementById('copy-btn');
+        
+        navigator.clipboard.writeText(roomCode).then(() => {
+            // Update button to show success
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.add('copied');
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy';
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy room code');
+        });
+    }
 </script>
 {% endblock %}
 

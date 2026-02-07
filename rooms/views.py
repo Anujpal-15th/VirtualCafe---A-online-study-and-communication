@@ -27,7 +27,7 @@ def landing_view(request):
 @login_required
 def home_view(request):
     """
-    Home dashboard showing all available rooms.
+    Home dashboard showing rooms created by the current user.
     Users must be logged in to see this page.
     """
     from tracker.models import StudySession
@@ -44,9 +44,11 @@ def home_view(request):
         expired_rooms.delete()
         messages.info(request, f'{expired_count} empty room(s) expired and removed.')
     
-    # Get all active rooms (not expired)
+    # Get all active PUBLIC rooms created by the current user
     rooms = Room.objects.filter(
-        Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now())
+        Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now()),
+        is_public=True,
+        created_by=request.user  # Only show rooms created by current user
     )
     
     # Get search query from GET parameters
@@ -154,6 +156,7 @@ def create_room_view(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         description = request.POST.get('description', '')
+        is_public = request.POST.get('is_public') == 'on'  # Checkbox value
         
         # Validate room name
         if not name or len(name.strip()) == 0:
@@ -164,7 +167,8 @@ def create_room_view(request):
         room = Room.objects.create(
             name=name,
             description=description,
-            created_by=request.user
+            created_by=request.user,
+            is_public=is_public
         )
         
         # Automatically add creator as a member
@@ -174,7 +178,8 @@ def create_room_view(request):
             is_active=True
         )
         
-        messages.success(request, f'Room "{name}" created successfully!')
+        visibility = "public" if is_public else "private"
+        messages.success(request, f'Room "{name}" created successfully as {visibility}!')
         return redirect('room_detail', room_code=room.room_code)
     
     # GET request - show form
@@ -185,22 +190,14 @@ def create_room_view(request):
 def global_chat_view(request):
     """
     Global chat room where anyone can join and chat with everyone.
-    Creates the global room if it doesn't exist.
+    Requires the global room to be created first.
     """
-    # Get or create the global chat room
-    global_room, created = Room.objects.get_or_create(
-        room_code='GLOBAL',
-        defaults={
-            'name': 'Global Chat Room',
-            'description': 'A public space where everyone can chat and study together!',
-            'created_by': request.user
-        }
-    )
-    
-    # If room was just created, set it as not expiring
-    if created:
-        global_room.expires_at = None
-        global_room.save()
+    # Try to get the global chat room (do not auto-create)
+    try:
+        global_room = Room.objects.get(room_code='GLOBAL')
+    except Room.DoesNotExist:
+        messages.error(request, 'Global chat room has not been created yet. Please contact administrator.')
+        return redirect('home')
     
     # Check if user is already a member
     existing_membership = RoomMembership.objects.filter(
@@ -238,6 +235,43 @@ def global_chat_view(request):
         'is_global': True,  # Flag to indicate this is the global room
     }
     return render(request, 'rooms/chat_room.html', context)
+
+
+@login_required
+def join_room_by_code_view(request):
+    """
+    Handle joining a room by entering a room code.
+    GET: Display join room form
+    POST: Join the room by code and redirect to room detail
+    """
+    if request.method == 'POST':
+        room_code = request.POST.get('room_code', '').strip().upper()
+        
+        # Validate room code
+        if not room_code:
+            messages.error(request, 'Please enter a room code.')
+            return redirect('home')
+        
+        # Try to find the room
+        try:
+            room = Room.objects.get(room_code=room_code)
+            
+            # Check if room has expired
+            if room.is_expired():
+                room.delete()
+                messages.error(request, 'This room has expired due to inactivity.')
+                return redirect('home')
+            
+            # Redirect to room detail (which handles membership creation)
+            messages.success(request, f'Joining room "{room.name}"...')
+            return redirect('room_detail', room_code=room.room_code)
+            
+        except Room.DoesNotExist:
+            messages.error(request, f'Room with code "{room_code}" not found. Please check the code and try again.')
+            return redirect('home')
+    
+    # GET request - redirect to home
+    return redirect('home')
 
 
 @login_required
